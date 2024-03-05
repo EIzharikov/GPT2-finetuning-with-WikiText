@@ -1,12 +1,3 @@
-chatbot
-chroma
-entrypoint
-gptq
-https
-param
-torchaudio
-torchvision
-vectordatabase
-venv
-whl
-wordlist
+GPT
+WikiText
+finetuning

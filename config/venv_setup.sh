@@ -10,4 +10,4 @@ source venv/bin/activate
 
 which python
 
-python -m pip install -r requirements_qa.txt
+python -m pip install -r requirements_ci.txt

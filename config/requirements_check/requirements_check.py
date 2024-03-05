@@ -14,7 +14,7 @@ def get_paths() -> list:
     """
     list_with_paths = []
     for file in PROJECT_ROOT.iterdir():
-        if file.name in ['requirements.txt', 'requirements_qa.txt']:
+        if file.name in ['requirements.txt', 'requirements_ci.txt']:
             list_with_paths.append(file)
     return list_with_paths
 

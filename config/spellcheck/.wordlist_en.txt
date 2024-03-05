@@ -1,3 +1,10 @@
-GPT
-WikiText
+Entrypoint
 finetuning
+GPT
+param
+WikiText
+wordlist
+
+
+
+

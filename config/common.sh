@@ -20,6 +20,6 @@ check_if_failed() {
 }
 
 get_project_directories() {
-  local directories=(main.py, lora_training, basic_training, helpers.py)
+  local directories=(basic_training.py)
   echo ${directories[@]}
 }

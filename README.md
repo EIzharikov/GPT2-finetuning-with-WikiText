@@ -9,6 +9,10 @@ Model: [URL](https://huggingface.co/datasets/wikitext)
 
 LoRA method paper: [URL](https://huggingface.co/datasets/wikitext)
 
+Trained basic model files: [URL](https://drive.google.com/drive/folders/1nQBboN9sUADdEPb1Fv9l8kln_0QKnrQo?usp=sharing)
+
+Trained LoRA model files: [URL](https://drive.google.com/drive/folders/1jB2IQSKPPyeND2cvbfAPxU0OfGbIJKj8?usp=sharing)
+
 Training params:
 
     learning_rate: 3e-05
@@ -43,19 +47,29 @@ python -m pip install -r requirements.txt
 python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
 
-5.If you want to test lora model, write this command
+5.Download the files of the model you want to use from the links
+above and put them in the appropriate folders.
+
+6.If you want to test lora model, write this command
 
 ```commandline
 python main.py -m lora
 ```
 
-6.If you want to test basic model, write this command
+7.If you want to test basic model, write this command
 
 ```commandline
 python main.py -m basic
 ```
 
-Conclusions: Two models were trained, one with LoRA, the other without.
+8.If you want to train yourself, launch basic or lora training files.
+
+```commandline
+python basic_training.py
+python lora_training.py
+```
+
+Conclusions: Two models were trained, one with LoRA, the other without LoRA.
 On the wikitext dataset, the first 1000 samples,
 because this time train was doing locally on his Nvidia RTX 3060 8GB graphics card.
 I decided that this task is no longer about high accuracy and other metrics,

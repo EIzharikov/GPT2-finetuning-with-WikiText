@@ -159,6 +159,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-basic_model/.
-lora_model/.
-preds/.
+basic_model/
+lora_model/
+preds/

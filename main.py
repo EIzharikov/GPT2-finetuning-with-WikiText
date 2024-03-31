@@ -1,12 +1,18 @@
+"""
+Inference logic
+"""
 import argparse
 
 from basic_training import BasicInferencePipeline
-from config.constants import LORA_MODEL_PATH, BASIC_MODEL_PATH
+from config.constants import BASIC_MODEL_PATH, LORA_MODEL_PATH
 from helpers import get_device
 from lora_training import FullInferenceLoraPipeline
 
 
-def main():
+def main() -> None:
+    """
+    Inference with user
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", type=str, help="The chosen model to use. "
                                                         "Write 'lora' if you want to use LoRA "
@@ -18,6 +24,7 @@ def main():
     max_len = 10
     device = get_device()
     test_dataset = None
+    pipe: BasicInferencePipeline
     if args.model == 'lora':
         pipe = FullInferenceLoraPipeline(LORA_MODEL_PATH,
                                          device,

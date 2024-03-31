@@ -4,11 +4,11 @@ import transformers
 from datasets import load_dataset
 from torch.utils.data import DataLoader
 from torchinfo import summary
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 from config.constants import BASIC_MODEL_PATH, BASIC_MODEL_PRED_PATH
-from helpers import print_summary, get_device, set_seed_in_everything, DataImporter, \
-    DataPreprocessor, TrainDataset, Evaluator
+from helpers import (DataImporter, DataPreprocessor, Evaluator, get_device, print_summary,
+                     set_seed_in_everything, TrainDataset)
 
 
 class BasicTrainPipeline:

@@ -1,26 +1,43 @@
+"""
+Implementation of LoRA training
+"""
 from pathlib import Path
 
 import torch
 from datasets import load_dataset
-from peft import LoraConfig, TaskType, get_peft_model
+from peft import get_peft_model, LoraConfig, TaskType
 from torch import nn
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 from basic_training import BasicInferencePipeline, BasicTrainPipeline
 from config.constants import LORA_MODEL_PATH, LORA_MODEL_PRED_PATH
-from helpers import get_device, set_seed_in_everything, DataImporter, DataPreprocessor, \
-    TrainDataset, Evaluator
+from helpers import (DataImporter, DataPreprocessor, Evaluator, get_device, set_seed_in_everything,
+                     TrainDataset)
 
 
 class FullLoraTrainPipeline(BasicTrainPipeline):
+    """
+    Class for LoRA training
+    """
 
     def __init__(self, model_name: str, current_device: str):
+        """
+        Initialize an instance of BasicTrainPipeline.
+
+        Args:
+             model_name (str): Name of the model
+             current_device (str): Device for model and tokenizer
+        """
         super().__init__(model_name, current_device)
         self.freeze_weights()
         self.set_lora_adapters()
         self._model.to(current_device)
 
-    def freeze_weights(self):
+    def freeze_weights(self) -> None:
+        """
+        Freeze weights of model.
+
+        """
         for param in self._model.parameters():
             param.requires_grad = False
             if param.ndim == 1:
@@ -35,6 +52,10 @@ class FullLoraTrainPipeline(BasicTrainPipeline):
         self._model.lm_head = CastOutputToFloat(self._model.lm_head)
 
     def set_lora_adapters(self):
+        """
+        Set LoRA adapters
+
+        """
         config = LoraConfig(
             r=16,
             lora_alpha=32,
@@ -48,7 +69,21 @@ class FullLoraTrainPipeline(BasicTrainPipeline):
 
 
 class FullInferenceLoraPipeline(BasicInferencePipeline):
-    def __init__(self, model_path: Path, device: str, dataset, batch_size: int, max_len: int):
+    """
+    Class for inference with LoRA model
+    """
+    def __init__(self, model_path: Path, device: str, dataset: TrainDataset | None, batch_size: int,
+                 max_len: int):
+        """
+        Initialize an instance of FullInferenceLoraPipeline.
+
+        Args:
+            model_path (Path): The path to the pre-trained model
+            device (str): The device for inference
+            dataset (TrainedDataset): The dataset used
+            batch_size (int): The size of the batch
+            max_len (int): The maximum length of generated sequence
+        """
         super().__init__(model_path, device, dataset, batch_size, max_len)
         clear_model = GPT2LMHeadModel.from_pretrained('openai-community/gpt2')
         lora_config = LoraConfig.from_pretrained(str(model_path))
@@ -64,7 +99,10 @@ class FullInferenceLoraPipeline(BasicInferencePipeline):
         self._device = device
 
 
-def main():
+def main() -> None:
+    """
+    Training
+    """
     batch_size = 8
     epochs = 2.0
     max_len = 10

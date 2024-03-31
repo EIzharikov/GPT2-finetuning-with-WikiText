@@ -1,25 +1,53 @@
+"""
+Implementation of basic training
+"""
+from pathlib import Path
+
 import pandas as pd
 import torch
 import transformers
-from datasets import load_dataset
+from datasets import load_dataset, Dataset
 from torch.utils.data import DataLoader
-from torchinfo import summary
-from transformers import GPT2Tokenizer, GPT2LMHeadModel
+from torchinfo import summary, ModelStatistics
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 from config.constants import BASIC_MODEL_PATH, BASIC_MODEL_PRED_PATH
-from helpers import print_summary, get_device, set_seed_in_everything, DataImporter, \
-    DataPreprocessor, TrainDataset, Evaluator
+from helpers import (DataImporter, DataPreprocessor, Evaluator, get_device, print_summary,
+                     set_seed_in_everything, TrainDataset)
 
 
 class BasicTrainPipeline:
-    def __init__(self, model_name: str, current_device: str):
+    """
+    Class for basic training
+    """
+
+    def __init__(self, model_name: str, current_device: str) -> None:
+        """
+        Initialize an instance of BasicTrainPipeline.
+
+        Args:
+             model_name (str): Name of the model
+             current_device (str): Device for model and tokenizer
+        """
         self._tokenizer = GPT2Tokenizer.from_pretrained(model_name)
         self._model = GPT2LMHeadModel.from_pretrained(model_name)
 
         self._device = current_device
         self._model.to(self._device)
 
-    def train(self, batch_size: int, num_epochs: float, train_data, eval_data, save_dir: str):
+    def train(self, batch_size: int, num_epochs: float,
+              train_data: Dataset, eval_data: Dataset, save_dir: Path | str) -> None:
+        # pylint: disable=too-many-arguments
+        """
+        Train the language model.
+
+        Args:
+            batch_size (int): The size of the batch for training
+            num_epochs (float): The number of epochs to train the model
+            train_data: The training dataset
+            eval_data: The evaluation dataset
+            save_dir (str): The directory to save the trained model
+        """
         train_data = train_data.map(lambda samples: self._tokenizer(samples['text']))
         eval_data = eval_data.map(lambda samples: self._tokenizer(samples['text']))
 
@@ -56,12 +84,25 @@ class BasicTrainPipeline:
         self._save_model(trainer, save_dir)
 
     @staticmethod
-    def _save_model(trainer, path):
+    def _save_model(trainer: transformers.Trainer, path: str) -> None:
+        """
+        Save the trained model.
+
+        Args:
+            trainer(transformers.Trainer): The model trainer
+            path (str): The directory to save the model
+        """
         model_to_save = trainer.model.module if hasattr(trainer.model,
                                                         'module') else trainer.model
         model_to_save.save_pretrained(path)
 
-    def get_stats(self):
+    def get_stats(self) -> ModelStatistics:
+        """
+        Get statistics about the model.
+
+        Returns:
+            dict: A dictionary containing statistics about the model.
+        """
         config = self._model.config
 
         embeddings_length = config.max_position_embeddings
@@ -79,7 +120,23 @@ class BasicTrainPipeline:
 
 
 class BasicInferencePipeline:
-    def __init__(self, model_path, device, dataset, batch_size, max_len):
+    """
+    Class for inference with basic model
+    """
+
+    def __init__(self, model_path: Path, device: str, dataset: TrainDataset | None, batch_size: int,
+                 max_len: int) -> None:
+        # pylint: disable=too-many-arguments
+        """
+        Initialize an instance of BasicInferencePipeline.
+
+        Args:
+            model_path (Path): The path to the pre-trained model
+            device (str): The device for inference
+            dataset (TrainedDataset): The dataset used
+            batch_size (int): The size of the batch
+            max_len (int): The maximum length of generated sequence
+        """
         self._tokenizer = GPT2Tokenizer.from_pretrained('openai-community/gpt2',
                                                         padding_side='left')
         self._tokenizer.pad_token = self._tokenizer.eos_token
@@ -91,7 +148,13 @@ class BasicInferencePipeline:
         self._max_length = max_len
         self._device = device
 
-    def infer_dataset(self):
+    def infer_dataset(self) -> pd.DataFrame:
+        """
+        Infer the model on the entire dataset.
+
+        Returns:
+            pd.DataFrame: A DataFrame containing predictions.
+        """
         predictions = []
         dataset_loader = DataLoader(self._dataset, batch_size=self._batch_size)
 
@@ -142,16 +205,18 @@ class BasicInferencePipeline:
         return list(str(i) for i in pred)
 
 
-def main():
+def main() -> None:
+    """
+    Training
+    """
     batch_size = 8
     epochs = 2.0
     max_len = 10
     model = 'openai-community/gpt2'
     device = get_device()
     print(f'DEVICE IS {device}')
-    seed = 42
-    set_seed_in_everything(seed)
-    print(f'SEED IS {seed}')
+    set_seed_in_everything(42)
+    print(f'SEED IS {42}')
 
     train_dataset = load_dataset('wikitext',
                                  'wikitext-2-raw-v1',

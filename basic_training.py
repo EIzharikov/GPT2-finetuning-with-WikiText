@@ -124,7 +124,7 @@ class BasicInferencePipeline:
     Class for inference with basic model
     """
 
-    def __init__(self, model_path: Path, device: str, dataset: TrainDataset, batch_size: int,
+    def __init__(self, model_path: Path, device: str, dataset: TrainDataset | None, batch_size: int,
                  max_len: int) -> None:
         # pylint: disable=too-many-arguments
         """
@@ -133,7 +133,7 @@ class BasicInferencePipeline:
         Args:
             model_path (Path): The path to the pre-trained model
             device (str): The device for inference
-            dataset: The dataset used
+            dataset (TrainedDataset): The dataset used
             batch_size (int): The size of the batch
             max_len (int): The maximum length of generated sequence
         """
@@ -148,7 +148,7 @@ class BasicInferencePipeline:
         self._max_length = max_len
         self._device = device
 
-    def infer_dataset(self) -> None:
+    def infer_dataset(self) -> pd.DataFrame:
         """
         Infer the model on the entire dataset.
 
